@@ -33,7 +33,7 @@ values."
    '(
      python
      markdown
-     c-c++
+     (c-c++ :variables c-c++-enable-clang-support t)
      javascript
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
@@ -60,8 +60,12 @@ values."
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages
    '(
+     yasnippet
+     yasnippet-snippets
+     auto-complete-c-headers
      all-the-icons
      magit
+     auto-complete
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -345,6 +349,35 @@ or the current buffer directory."
   (setq-default truncate-lines 0) ;; remove line-break
   (add-to-list 'auto-mode-alist '("\\.ejs\\'" . html-mode)) ;; treat ejs files as html files
 
+  ;; Adding auto complition and snippets
+  (require 'auto-complete)
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (require 'yasnippet)
+  (yas-global-mode 1)
+  ;; Adding auto header file generator
+  (defun my:ac-c-header-init ()
+    (require 'auto-complete-c-headers)
+    (add-to-list 'ac-sources 'ac-source-c-headers)
+    (setq achead:include-directories
+          (append '("/usr/include/c++/5"
+                    "/usr/include/x86_64-linux-gnu/c++/5"
+                    "/usr/include/c++/5/backward"
+                    "/usr/lib/gcc/x86_64-linux-gnu/5/include"
+                    "/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"
+                    "/usr/include/x86_64-linux-gnu"
+                    "/usr/local/include"
+                    "/usr/include")
+                  achead:include-directories)))
+  ; now let's call this funcion from c/c++ hooks
+  (add-hook 'c++-mode-hook 'my:ac-c-header-init)
+  (add-hook 'c-mode-hook 'my:ac-c-header-init)
+
+  ;; ADDING SUPPORT FOR C AND C++
+  ;; --------------------------------------
+  ;(push '("C" "h") projectile-other-file-alist)
+  (put 'helm-make-build-dir 'safe-local-variable 'stringp)
+
   ;; LIST OF CURRENT WORKSPASES
   ;; --------------------------------------
   ;(neotree-dir "/media/tigran/Common/averta-ct-serial/averta-ct/")
@@ -363,7 +396,7 @@ or the current buffer directory."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (magit transient git-commit with-editor yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic disaster cmake-mode clang-format mmm-mode markdown-toc markdown-mode gh-md memoize spaceline-all-the-icons all-the-icons web-beautify tern livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (auto-complete-c-headers yasnippet-snippets auto-complete magit transient git-commit with-editor yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic disaster cmake-mode clang-format mmm-mode markdown-toc markdown-mode gh-md memoize spaceline-all-the-icons all-the-icons web-beautify tern livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor yasnippet multiple-cursors js2-mode js-doc coffee-mode ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -375,4 +408,18 @@ or the current buffer directory."
 ;; -----------------------
 
 (setq neo-theme 'icons)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
